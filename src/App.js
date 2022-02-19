@@ -41,6 +41,7 @@ function App() {
 
 const StockFinderInput = ({ onSearch, debounceMs }) => {
   const [search, setSearch] = React.useState("");
+  const untilNow = React.useRef({});
   const debounceRef = React.useRef(undefined);
   React.useEffect(() => {
     if (debounceRef.current) {
@@ -50,12 +51,14 @@ const StockFinderInput = ({ onSearch, debounceMs }) => {
       setTimeout(() => {
         axios.get(`/api/data?search_string=${search}`).then(({ data }) => {
           onSearch(data);
+          untilNow.current = { ...untilNow.current, [search]: [...(untilNow[search]||[]), ...data] }
         });
       }, debounceMs);
     }
     if (search === "") {
       onSearch([]);
     }
+    console.log(untilNow);
   }, [search, debounceMs, onSearch]);
   return (
     <div>
